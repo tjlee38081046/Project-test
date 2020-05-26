@@ -1,0 +1,45 @@
+---
+title: "04-20-In-class exercises-3"
+author: "TJLee"
+date: "`r Sys.Date()`"
+output:
+  prettydoc::html_pretty:
+    theme: purple
+    highlight: github
+
+---
+```{r}
+#load &see
+data <- datasets::USPersonalExpenditure
+head(data)
+str(data)
+
+# transform to long form
+library(reshape2)
+mdata <- melt(data)  
+head(mdata)
+
+#Def. colname
+colnames(mdata) <- c("category", "year", "expenditure")
+head(mdata)
+
+
+##transform the dollar amounts to log base 10  
+logexp <- round(log10(mdata$expenditure),2)
+head(logexp)
+resultdata <- cbind(mdata,logexp)
+##draw ggplot
+library(ggplot2)
+p0 <- ggplot(resultdata) +
+  aes(x=logexp, y=category,color = logexp>mean(logexp))  +
+  geom_point(size=rel(3)) +
+  facet_grid(. ~ year) +
+  geom_segment(aes(xend=logexp, yend=category, x=mean(logexp))) + 
+  geom_vline(aes(xintercept=mean(logexp)))+
+ scale_colour_manual(values = c("purple", "blue"))
+
+       
+p0 + theme(legend.position = 'top')
+
+
+
